@@ -4,6 +4,8 @@ import argparse
 from mmcv import Config
 
 from mmselfsup.models import build_algorithm
+import hiddenlayer as hl
+import torch
 
 
 def parse_args():
@@ -19,6 +21,30 @@ def main():
     cfg = Config.fromfile(args.config)
 
     model = build_algorithm(cfg.model)
+    transforms = [
+        # Fold Conv, BN, RELU layers into one
+        hl.transforms.Fold("Conv > BatchNorm > Relu", "ConvBnRelu"),
+        # Fold Conv, BN layers together
+        hl.transforms.Fold("Conv > BatchNorm", "ConvBn"),
+        # Fold bottleneck blocks
+        hl.transforms.Fold("""
+            ((ConvBnRelu > ConvBnRelu > ConvBn) | ConvBn) > Add > Relu
+            """, "BottleneckBlock", "Bottleneck Block"),
+        # Fold residual blocks
+        hl.transforms.Fold("""ConvBnRelu > ConvBnRelu > ConvBn > Add > Relu""",
+                        "ResBlock", "Residual Block"),
+        # Fold bottleneck blocks
+        hl.transforms.Fold("""
+            ((ConvBnRelu > ConvBn) | ConvBn) > Add > Relu
+            """, "BottleneckBlock", "Bottleneck Block"),
+        # Fold residual blocks
+        hl.transforms.Fold("""ConvBnRelu > ConvBn > Add > Relu""",
+                        "ResBlock", "Residual Block"),
+        # Fold repeated blocks
+        hl.transforms.FoldDuplicates(),
+    ]
+    # hl.build_graph(model.encoder_q[0], torch.zeros([32, 3, 224, 224]), transforms=transforms).save(f'{args.config}_diagram.png', 'png')
+    hl.build_graph(model, [torch.zeros([32, 3, 224, 224])]*2, transforms=transforms).save(f'{args.config}_diagram.png', 'png')
 
     num_params = sum(p.numel() for p in model.parameters()) / 1000000.
     num_grad_params = sum(

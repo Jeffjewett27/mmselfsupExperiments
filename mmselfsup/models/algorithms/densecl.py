@@ -142,6 +142,8 @@ class DenseCL(BaseModel):
         im_k = img[1]
         # compute query features
         q_b = self.encoder_q[0](im_q)  # backbone features
+        # print(self.encoder_q[1])
+        # print(f'q_b: {[x.size() for x in q_b]}')
         q, q_grid, q2 = self.encoder_q[1](q_b)  # queries: NxC; NxCxS^2
         q_b = q_b[0]
         q_b = q_b.view(q_b.size(0), q_b.size(1), -1)
@@ -229,4 +231,4 @@ class DenseCL(BaseModel):
         q_grid = self.extract_feat(im_q)[0]
         q_grid = q_grid.view(q_grid.size(0), q_grid.size(1), -1)
         q_grid = nn.functional.normalize(q_grid, dim=1)
-        return None, q_grid, None
+        return q_grid

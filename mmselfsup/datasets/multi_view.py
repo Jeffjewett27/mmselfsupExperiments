@@ -36,7 +36,7 @@ class MultiViewDataset(BaseDataset):
         were processed by pipeline1 and the remaining views by pipeline2.
     """
 
-    def __init__(self, data_source, num_views, pipelines, prefetch=False):
+    def __init__(self, data_source, num_views, pipelines, prefetch=False, byAxis=-1):
         assert len(num_views) == len(pipelines)
         self.data_source = build_datasource(data_source)
         self.pipelines = []
@@ -44,6 +44,7 @@ class MultiViewDataset(BaseDataset):
             pipeline = Compose([build_from_cfg(p, PIPELINES) for p in pipe])
             self.pipelines.append(pipeline)
         self.prefetch = prefetch
+        self.byAxis = byAxis
 
         trans = []
         assert isinstance(num_views, list)
@@ -58,6 +59,8 @@ class MultiViewDataset(BaseDataset):
             multi_views = [
                 torch.from_numpy(to_numpy(img)) for img in multi_views
             ]
+        if self.byAxis >= 0:
+            multi_views = torch.cat(multi_views, self.byAxis)
         return dict(img=multi_views)
 
     def evaluate(self, results, logger=None):
