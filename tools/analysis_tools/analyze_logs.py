@@ -159,6 +159,7 @@ def load_json_logs(json_logs):
             sub dict is different metrics, e.g. memory, bbox_mAP, value of
             sub dict is a list of corresponding values of all iterations.
     """
+    print(json_logs)
     log_dicts = [dict() for _ in json_logs]
     for json_log, log_dict in zip(json_logs, log_dicts):
         with open(json_log, 'r') as log_file:

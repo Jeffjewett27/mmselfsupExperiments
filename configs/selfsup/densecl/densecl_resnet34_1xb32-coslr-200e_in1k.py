@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/models/densecl.py',
+    '../_base_/models/densecl34.py',
     './coco_dcl.py',
     '../_base_/schedules/sgd_coslr-200e_in1k.py',
     '../_base_/default_runtime.py',
