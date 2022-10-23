@@ -7,6 +7,7 @@ log_config = dict(
     hooks=[
         dict(type='TextLoggerHook'),
         dict(type='TensorboardLoggerHook'),
+        dict(type='NeptuneLoggerHook', project='jeffjewett27/SMM2-SSOD', interval=50),
     ])
 # yapf:enable
 
