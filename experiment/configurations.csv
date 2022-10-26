@@ -1,4 +1,4 @@
-,backbone,learning_rate,momentum,decay,scheduler,cosine_period,step_period,initialization,trained
+idx,backbone,learning_rate,momentum,decay,scheduler,cosine_period,step_period,initialization,trained
 0,resnet34,0.0041144470309915,0.99,0.0028668294359542,CosineRestart,10,10,Kaiming,Trained
 1,resnet34,0.0104919647369703,0.95,0.0005291491504525,CosineRestart,20,30,Kaiming,Trained
 2,resnet18,0.002943498826236,0.95,0.0080201994038811,step,5,10,Xavier,Trained
