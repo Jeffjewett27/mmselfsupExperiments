@@ -1,0 +1,9 @@
+,backbone,learning_rate,momentum,decay,scheduler,cosine_period,step_period,initialization,trained
+1,resnet18,0.0095673901374684,0.99,0.0001447283650282,step,15,30,Kaiming,Error
+11,resnet18,0.0574619078544949,0.99,0.0052000264394161,CosineRestart,10,30,Xavier,Untrained
+21,resnet18,0.0007236001684825,0.9,0.0062058834631416,CosineRestart,10,40,Kaiming,Untrained
+31,resnet18,0.0078735527649625,0.8,0.0030840971787776,CosineRestart,20,30,Xavier,Untrained
+41,resnet18,0.0023803579735319,0.9,0.0036948721539545,step,15,30,Xavier,Untrained
+51,resnet34,0.0002454825524955,0.99,0.0001058880417067,step,10,20,Kaiming,Untrained
+61,resnet18,0.0048163787295157,0.99,0.0002216066935116,CosineRestart,10,10,Xavier,Untrained
+71,resnet18,0.0183925047011524,0.95,0.0003736939922577,step,15,40,Xavier,Untrained

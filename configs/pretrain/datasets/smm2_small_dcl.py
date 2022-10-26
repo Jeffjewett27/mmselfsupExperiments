@@ -34,8 +34,8 @@ data = dict(
         type=dataset_type,
         data_source=dict(
             type=data_source,
-            data_prefix='data/smm2/smm2/youtube_small/train',
-            ann_file='data/smm2/smm2/youtube_small/trainList.txt',
+            data_prefix='data/smm2/youtube_small/train',
+            ann_file='data/trainListSmall.txt',
         ),
         num_views=[2],
         pipelines=[train_pipeline],
@@ -45,12 +45,11 @@ data = dict(
         type=dataset_type,
         data_source=dict(
             type=data_source,
-            data_prefix='data/smm2/smm2/youtube_small/validation',
-            ann_file='data/smm2/smm2/youtube_small/valList',
+            data_prefix='data/smm2/youtube_small/validation',
+            ann_file='data/valListSmall.txt',
         ),
         num_views=[2],
         pipelines=[train_pipeline],
         prefetch=False,
         byAxis=1
     ))
-evaluation = dict(metric=['loss', 'loss_dense', 'loss_single'])

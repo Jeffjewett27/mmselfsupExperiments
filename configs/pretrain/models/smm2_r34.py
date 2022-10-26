@@ -1,3 +1,5 @@
+import configs.environment as env
+
 # model settings
 model = dict(
     type='DenseCL',
@@ -7,10 +9,12 @@ model = dict(
     loss_lambda=0.5,
     backbone=dict(
         type='ResNet',
-        depth=34,
+        depth=env.depth,
         in_channels=3,
         out_indices=[4],
         norm_cfg=dict(type='BN')),
+        init_cfg=dict(
+            type=env.init, distribution='uniform'),
     neck=dict(
         type='DenseCLNeck',
         in_channels=512,
