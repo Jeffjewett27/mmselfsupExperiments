@@ -10,13 +10,14 @@ configs = rawconfigs.iloc[shardIdx::shardMag]
 epochs = 5
 max_errors = 1
 hpo_step = 1
+prefix = 'presmall'
 
 # print(configs)
 
 errors = 0
 for index, row in configs.iterrows():
     if row['trained'] == 'Trained':
-        print(f'pretrain{index} already trained')
+        print(f'{prefix}{index} already trained')
         continue
     config = row.to_dict()
     config = {c.upper():str(config[c]) for c in config}
