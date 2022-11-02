@@ -1,3 +1,4 @@
+import argparse
 import neptune.new as neptune
 import os
 import pandas as pd
@@ -106,13 +107,25 @@ def run_trial(config, stage, trial, stageIndex):
         run['meta/status'] = 'failed'
     run.stop()
     
+parser = argparse.ArgumentParser(description='Run SHA on trials')
+parser.add_argument('--config', '-c', metavar='C', type=str,
+    help='the trial configurations file')
+parser.add_argument('--sha', '-s', metavar='S', type=str,
+        help='the SHA configurations file')
+parser.add_argument('--execution', '-e', metavar='E', type=str,
+    help='the script to execute on each trial')
+parser.add_argument('--prefix', '-p', metavar='P', type=str,
+    help='the prefix for the name, eg prefix2-4'),
+parser.add_argument('--tags', '-t', metavar='T', type=str, nargs='*',
+        help='tags to add to neptune')
+args = parser.parse_args()
 
-trialconfigs = get_trial_configs('experiment/configurations.csv')
-sha = get_sha_config('experiment/pretrain_small_sha_v2.csv')
+trialconfigs = get_trial_configs(args.config)
+sha = get_sha_config(args.sha)
 project = get_project()
-execution = 'execution/smm2_test_1.sh'
-prefix = 'presmall'
-tags = ['pretrain']
+execution = args.execution
+prefix = args.prefix
+tags = args.tags
 
 runs = get_runs(project)
 
@@ -120,12 +133,16 @@ while True:
     runs = get_runs(project)
     stage = get_next_stage(runs, sha)
     stageIndex = get_next_trial(runs, stage.stage)
+    if stageIndex is None:
+        break
     if stageIndex < stage.trials:
         # train on the trial
 
         if stage.stage > 1:
             stagetrials = runs[runs.stage==stage.stage-1].sort_values(by='train/loss').head(stage.trials)
             selected = stagetrials.iloc[stageIndex]['meta/trial']
+            # trialconfigs.iloc[stagetrials['trial']].reset_index().drop(['idx','index'], axis=1).reset_index().to_csv('experiment/mediumtrials.csv', index=False)
+            # break
         else:
             selected = stageIndex
         print(f'TRAINING ON STAGE {stage.stage}-{stageIndex} AND TRIAL {selected}')
