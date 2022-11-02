@@ -32,6 +32,9 @@ def get_runs(project):
     if 'meta/status' not in runs.columns:
         runs['meta/status'] = 'untrained'
 
+    runs['meta/stage'] = runs['meta/stage'].astype('Int64')
+    runs['meta/trial'] = runs['meta/trial'].astype('Int64')
+    runs['meta/index'] = runs['meta/index'].astype('Int64')
     runs[['stage','trial']] = runs['sys/name'].str.split('-',expand=True)
     runs = runs.dropna()
     runs['stage'] = runs['stage'].str.replace(r'\D+', '', regex=True).astype(int)
