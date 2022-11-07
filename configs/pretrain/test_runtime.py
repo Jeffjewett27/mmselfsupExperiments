@@ -1,21 +1,23 @@
-import configs.environment as env
+# import configs.environment as env
 
 # checkpoint saving
-checkpoint_config = dict(interval=2, max_keep_ckpts=3)
+checkpoint_config = dict(interval=2, max_keep_ckpts=1)
 
 # yapf:disable
 log_config = dict(
     interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
+        dict(type='TensorboardLoggerHook'),
         dict(type='NeptuneLoggerHook', interval=10, init_kwargs=dict(
             project='jeffjewett27/SMM2-SSOD',
-            name=env.trial,
-            custom_run_id=env.trial
+            name='longtest1',
+            custom_run_id='longtest1'
         )),
     ])
-        # dict(type='TensorboardLoggerHook'),
 # yapf:enable
+
+# custom_hooks = [dict(type='DenseCLHook', loss_lambda=1000)]
 
 # runtime settings
 dist_params = dict(backend='nccl')

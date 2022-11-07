@@ -1,4 +1,3 @@
-import os
 import configs.environment as env
 
 # optimizer

@@ -1,0 +1,4 @@
+small:
+  trials: experiments/configs/smalltrials.csv
+  sha: experiments/configs/smallsha.csv
+  prefix: pretrainsmall

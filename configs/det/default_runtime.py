@@ -1,11 +1,16 @@
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=50,
+    interval=20,
     hooks=[
         dict(type='TextLoggerHook'),
-        dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook'),
     ])
+        # dict(type='NeptuneLoggerHook', interval=20, init_kwargs=dict(
+        #     project='jeffjewett27/SMM2-SSOD',
+        #     name='dettest1',
+        #     custom_run_id='dettest1'
+        # )),
 # yapf:enable
 custom_hooks = [dict(type='NumClassCheckHook')]
 

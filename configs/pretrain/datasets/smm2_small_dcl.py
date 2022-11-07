@@ -35,7 +35,7 @@ data = dict(
         data_source=dict(
             type=data_source,
             data_prefix='data/smm2/youtube_small/train',
-            ann_file='data/trainListSmall.txt',
+            ann_file='data/smm2/youtube_small/trainList.txt',
         ),
         num_views=[2],
         pipelines=[train_pipeline],
@@ -46,7 +46,7 @@ data = dict(
         data_source=dict(
             type=data_source,
             data_prefix='data/smm2/youtube_small/validation',
-            ann_file='data/valListSmall.txt',
+            ann_file='data/smm2/youtube_small/valList.txt',
         ),
         num_views=[2],
         pipelines=[train_pipeline],

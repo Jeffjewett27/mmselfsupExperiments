@@ -1,4 +1,5 @@
 import argparse
+import shutil
 import neptune.new as neptune
 import os
 import pandas as pd
@@ -8,49 +9,55 @@ from datetime import datetime, timedelta
 
 FAILURE_TIMEOUT = 60 #sleep 1 minutes before checking for new trial
 MODIFICATION_TIMEOUT = 300 #wait 5 minutes before modifying unfinished run
+EXPERIMENT='meta/experiment'
+STAGE='meta/stage'
+TRIAL='meta/trial'
+INDEX='meta/index'
+STATUS='meta/status'
+
+STATUS_TRAINED='trained'
+STATUS_UNTRAINED='untrained'
 
 def get_project():
     return neptune.get_project(name=os.getenv('NEPTUNE_PROJECT'))
 
-def get_runs(project):
+def get_runs(project, experiment):
     runs = project.fetch_runs_table(owner=os.getenv('NEPTUNE_PROFILE'), columns=[
             'sys/name', 
             'sys/state', 
-            'train/loss', 
-            'sys/tags', 
+            'train/loss',
             'sys/modification_time',
-            'meta/stage',
-            'meta/trial',
-            'meta/index',
-            'meta/status'
+            EXPERIMENT,
+            STAGE,
+            TRIAL,
+            INDEX,
+            STATUS
         ]).to_pandas()
-    if 'meta/stage' not in runs.columns:
-        runs['meta/stage'] = -1
-    if 'meta/trial' not in runs.columns:
-        runs['meta/trial'] = -1
-    if 'meta/index' not in runs.columns:
-        runs['meta/index'] = -1
-    if 'meta/status' not in runs.columns:
-        runs['meta/status'] = 'untrained'
+    if STAGE not in runs.columns:
+        runs[STAGE] = -1
+    if TRIAL not in runs.columns:
+        runs[TRIAL] = -1
+    if INDEX not in runs.columns:
+        runs[TRIAL] = -1
+    if STATUS not in runs.columns:
+        runs[STATUS] = STATUS_UNTRAINED
+    if EXPERIMENT not in runs.columns:
+        runs[EXPERIMENT] = ''
 
-    runs['meta/stage'] = runs['meta/stage'].astype('Int64')
-    runs['meta/trial'] = runs['meta/trial'].astype('Int64')
-    runs['meta/index'] = runs['meta/index'].astype('Int64')
-    runs[['stage','trial']] = runs['sys/name'].str.split('-',expand=True)
+    runs[STAGE] = runs[STAGE].astype('Int64')
+    runs[TRIAL] = runs[TRIAL].astype('Int64')
+    runs[INDEX] = runs[INDEX].astype('Int64')
     runs = runs.dropna()
-    runs['stage'] = runs['stage'].str.replace(r'\D+', '', regex=True).astype(int)
-    runs['trial'] = runs['trial'].astype(int)
-    runs['finished'] = runs['sys/tags'].str.contains('trained')
+    runs = runs[runs[EXPERIMENT]==experiment]
     return runs
 
 def get_next_trial(runs, stage, finished=False):
     if finished:
-        runs = runs[runs['meta/status'] == 'trained']
-        print('lenruns', len(runs))
+        runs = runs[runs[STATUS] == STATUS_TRAINED]
     else:
         cutoff = pd.Timestamp(datetime.utcnow() - timedelta(seconds=MODIFICATION_TIMEOUT)).tz_localize('utc')
-        runs = runs[(runs['sys/modification_time'] > cutoff) | (runs['meta/status'] == 'trained')]
-    trials = runs[runs.stage == stage].sort_values(by='trial')['trial']
+        runs = runs[(runs['sys/modification_time'] > cutoff) | (runs[STATUS] == STATUS_TRAINED)]
+    trials = runs[runs[STAGE] == stage].sort_values(by=TRIAL)[TRIAL]
     prevtrial = -1
     for t in trials:
         if t - prevtrial > 1:
@@ -87,7 +94,8 @@ def run_trial(config, stage, trial, stageIndex):
         trial=trial,
         index=stageIndex,
         epochs=stage.epochs,
-        status='training'
+        status='training',
+        experiment=prefix
     )
 
     run = neptune.init_run(
@@ -102,9 +110,12 @@ def run_trial(config, stage, trial, stageIndex):
     environ.update(config)
     complete = subprocess.run(['bash', execution], env=environ)
     if complete.returncode == 0:
-        run['meta/status'] = 'trained'
+        run[STATUS] = STATUS_TRAINED
+        if not stage.save:
+            workdir = f'work_dirs/pretrain/{meta["name"]}'
+            shutil.rmtree(workdir)
     else:
-        run['meta/status'] = 'failed'
+        run[STATUS] = STATUS_FAILED
     run.stop()
     
 parser = argparse.ArgumentParser(description='Run SHA on trials')
@@ -127,10 +138,10 @@ execution = args.execution
 prefix = args.prefix
 tags = args.tags
 
-runs = get_runs(project)
+# runs = get_runs(project, prefix)
 
 while True:
-    runs = get_runs(project)
+    runs = get_runs(project, prefix)
     stage = get_next_stage(runs, sha)
     stageIndex = get_next_trial(runs, stage.stage)
     if stageIndex is None:
@@ -139,8 +150,8 @@ while True:
         # train on the trial
 
         if stage.stage > 1:
-            stagetrials = runs[runs.stage==stage.stage-1].sort_values(by='train/loss').head(stage.trials)
-            selected = stagetrials.iloc[stageIndex]['meta/trial']
+            stagetrials = runs[runs[STAGE]==stage.stage-1].sort_values(by='train/loss').head(stage.trials)
+            selected = stagetrials.iloc[stageIndex][TRIAL]
             # trialconfigs.iloc[stagetrials['trial']].reset_index().drop(['idx','index'], axis=1).reset_index().to_csv('experiment/mediumtrials.csv', index=False)
             # break
         else:

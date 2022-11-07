@@ -1,23 +1,20 @@
-import configs.environment as env
-
 # model settings
 model = dict(
     type='DenseCL',
     queue_len=65536,
     feat_dim=128,
     momentum=0.999,
-    loss_lambda=env.lossLambda,
+    loss_lambda=0.5,
     backbone=dict(
         type='ResNet',
-        depth=50,
+        depth=34,
         in_channels=3,
-        out_indices=[4],
-        norm_cfg=dict(type='BN')),
-        init_cfg=dict(
-            type=env.init, distribution='uniform'),
+        norm_cfg=dict(type='BN'),
+        init_cfg=dict(type='Kaiming', distribution='uniform')),
+        # init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet34')),
     neck=dict(
         type='DenseCLNeck',
-        in_channels=2048,
+        in_channels=512,
         hid_channels=2048,
         out_channels=128,
         num_grid=None),
