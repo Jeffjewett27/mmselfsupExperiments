@@ -28,6 +28,7 @@ def get_runs(project, experiment):
             'sys/state', 
             'train/loss',
             'sys/modification_time',
+            'sys/tags',
             EXPERIMENT,
             STAGE,
             TRIAL,
@@ -50,6 +51,7 @@ def get_runs(project, experiment):
     runs[INDEX] = runs[INDEX].astype('Int64')
     runs = runs.dropna()
     runs = runs[runs[EXPERIMENT]==experiment]
+    runs['override'] = runs['sys/tags'].str.contains('override')
     return runs
 
 def get_next_trial(runs, stage, finished=False):
@@ -57,13 +59,13 @@ def get_next_trial(runs, stage, finished=False):
         runs = runs[runs[STATUS] == STATUS_TRAINED]
     else:
         cutoff = pd.Timestamp(datetime.utcnow() - timedelta(seconds=MODIFICATION_TIMEOUT)).tz_localize('utc')
-        runs = runs[(runs['sys/modification_time'] > cutoff) | (runs[STATUS] == STATUS_TRAINED)]
-    trials = runs[runs[STAGE] == stage].sort_values(by=TRIAL)[TRIAL]
+        runs = runs[(runs['sys/modification_time'] > cutoff) | (runs[STATUS] == STATUS_TRAINED) | runs['override']]
+    trials = runs[runs[STAGE] == stage].sort_values(by=INDEX)[[TRIAL,INDEX]]
     prevtrial = -1
-    for t in trials:
-        if t - prevtrial > 1:
+    for _, row in trials.iterrows():
+        if row[INDEX] - prevtrial > 1:
             break
-        prevtrial = t
+        prevtrial = row[INDEX]
     return prevtrial + 1
 
 def get_sha_config(shaconfig):
@@ -75,7 +77,7 @@ def get_trial_configs(trialconfig):
 def get_next_stage(runs, sha):
     sha = sha.sort_values(by='stage')
     for _, stage in sha.iterrows():
-        trial = get_next_trial(runs, stage.stage, finished=True)
+        trial = get_next_trial(runs, stage.stage, finished=False)
         if trial < stage.trials:
             return stage
     return None
