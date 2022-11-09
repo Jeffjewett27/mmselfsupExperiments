@@ -1,6 +1,6 @@
 stage,trials,epochs,save
 1,72,25,FALSE
-2,24,50,FALSE
+2,16,50,FALSE
 3,8,100,FALSE
 4,4,150,FALSE
 2,2,200,TRUE
