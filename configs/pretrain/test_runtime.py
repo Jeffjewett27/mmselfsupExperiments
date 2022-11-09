@@ -1,7 +1,7 @@
 # import configs.environment as env
 
 # checkpoint saving
-checkpoint_config = dict(interval=2, max_keep_ckpts=1)
+checkpoint_config = dict(interval=5, max_keep_ckpts=1)
 
 # yapf:disable
 log_config = dict(
@@ -11,8 +11,8 @@ log_config = dict(
         dict(type='TensorboardLoggerHook'),
         dict(type='NeptuneLoggerHook', interval=10, init_kwargs=dict(
             project='jeffjewett27/SMM2-SSOD',
-            name='longtest1',
-            custom_run_id='longtest1'
+            name='longtest2',
+            custom_run_id='longtest2'
         )),
     ])
 # yapf:enable

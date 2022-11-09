@@ -1,7 +1,7 @@
 _base_ = [
     'models/frcnn_r50_c4.py',
     'datasets/det_example.py',
-    'schedules/det_example.py', 
+    'schedules/schedule_2x.py', 
     'default_runtime.py'
 ]
 

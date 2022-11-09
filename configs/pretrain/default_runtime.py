@@ -1,14 +1,14 @@
 import configs.environment as env
 
 # checkpoint saving
-checkpoint_config = dict(interval=2, max_keep_ckpts=3)
+checkpoint_config = dict(interval=5, max_keep_ckpts=2)
 
 # yapf:disable
 log_config = dict(
     interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
-        dict(type='NeptuneLoggerHook', interval=10, init_kwargs=dict(
+        dict(type='NeptuneLoggerHook', interval=20, init_kwargs=dict(
             project='jeffjewett27/SMM2-SSOD',
             name=env.trial,
             custom_run_id=env.trial

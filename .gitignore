@@ -122,6 +122,7 @@ replace.sh
 benchmarks/detection/datasets
 benchmarks/detection/output
 INFO
+.neptune/
 
 # Pytorch
 *.pth

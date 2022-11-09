@@ -3,6 +3,12 @@ import sys
 
 env = os.environ
 init = env['INITIALIZATION']
+if init == 'Xavier':
+    initCfg=dict(type='Xavier', distribution='uniform')
+elif init == 'Kaiming':
+    initCfg=dict(type='Kaiming', distribution='uniform')
+else:
+    initCfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')
 
 nperiods = 20
 cosperiod = [i*int(env['COSINE_PERIOD']) for i in range(1,nperiods+1)]

@@ -40,7 +40,8 @@ model = dict(
             dilation=1,
             style='pytorch',
             norm_cfg=norm_cfg,
-            norm_eval=True),
+            norm_eval=True,
+            init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
         bbox_roi_extractor=dict(
             type='SingleRoIExtractor',
             roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
@@ -80,8 +81,8 @@ model = dict(
             pos_weight=-1,
             debug=False),
         rpn_proposal=dict(
-            nms_pre=6000,
-            max_per_img=1000,
+            nms_pre=8000,
+            max_per_img=1200,
             nms=dict(type='nms', iou_threshold=0.7),
             min_bbox_size=0),
         rcnn=dict(

@@ -1,6 +1,6 @@
 _base_ = [
-    'models/smm2_r34.py',
+    'models/smm2_r50.py',
     'datasets/smm2_small_dcl.py',
-    'schedules/sgd_coslr-50e_c17.py',
+    'schedules/parameterized.py',
     'default_runtime.py',
 ]

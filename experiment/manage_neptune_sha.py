@@ -17,6 +17,7 @@ STATUS='meta/status'
 
 STATUS_TRAINED='trained'
 STATUS_UNTRAINED='untrained'
+STATUS_FAILED='failed'
 
 def get_project():
     return neptune.get_project(name=os.getenv('NEPTUNE_PROJECT'))

@@ -2,7 +2,7 @@
 dataset_type = 'CocoDataset'
 data_root = 'data/smm2/youtube_labeled/'
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    mean=[100.4, 108.63, 102.6], std=[62.86, 57.78, 59.69], to_rgb=True)
 classes=('mario','luigi','toad','toadette','general_enemy','goomba','shellish','biter','thwomp','boo','boss','coin',
     'powerup','blaster','icicle','bullet','door','spring','pow','on_off_switch','moving_platform','hazard','gizmo_item')
 train_pipeline = [
@@ -51,4 +51,4 @@ data = dict(
         img_prefix=data_root + 'test/',
         classes=classes,
         pipeline=test_pipeline))
-evaluation = dict(interval=1, metric='bbox')
+evaluation = dict(interval=2, metric='bbox', save_best='auto')
