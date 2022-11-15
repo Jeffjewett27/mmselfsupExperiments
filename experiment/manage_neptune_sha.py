@@ -89,6 +89,10 @@ def run_trial(config, stage, trial, stageIndex):
     config = {c.upper():str(config[c]) for c in config}
     config['TRIAL'] = name
     config['EPOCHS'] = str(stage.epochs)
+    config = {
+        **config,
+        **variables
+    }
     print('RUNNING TRIAL FOR CONFIG', config)
 
     meta = dict(
@@ -115,7 +119,7 @@ def run_trial(config, stage, trial, stageIndex):
     if complete.returncode == 0:
         run[STATUS] = STATUS_TRAINED
         if not stage.save:
-            workdir = f'work_dirs/pretrain/{meta["name"]}'
+            workdir = f'work_dirs/det/{meta["name"]}'
             shutil.rmtree(workdir)
     else:
         run[STATUS] = STATUS_FAILED
@@ -132,7 +136,13 @@ parser.add_argument('--prefix', '-p', metavar='P', type=str,
     help='the prefix for the name, eg prefix2-4'),
 parser.add_argument('--tags', '-t', metavar='T', type=str, nargs='*',
         help='tags to add to neptune')
+parser.add_argument('--priority', metavar='P', type=str, help='Order, Loss')
+parser.add_argument('--variables', '-v', metavar='V', type=str, 
+    help="Pass environment variables with a string of the form 'A=B;C=D'")
 args = parser.parse_args()
+
+variables = { v.split('=')[0]:v.split('=')[1] for v in args.variables.split(';') } \
+    if args.variables is not None and len(args.variables)>0 else {}
 
 trialconfigs = get_trial_configs(args.config)
 sha = get_sha_config(args.sha)
@@ -140,6 +150,7 @@ project = get_project()
 execution = args.execution
 prefix = args.prefix
 tags = args.tags
+priority = args.priority or 'Loss'
 
 # runs = get_runs(project, prefix)
 
@@ -152,7 +163,7 @@ while True:
     if stageIndex < stage.trials:
         # train on the trial
 
-        if stage.stage > 1:
+        if stage.stage > 1 and priority != 'Order':
             stagetrials = runs[runs[STAGE]==stage.stage-1].sort_values(by='train/loss').head(stage.trials)
             selected = stagetrials.iloc[stageIndex][TRIAL]
             # trialconfigs.iloc[stagetrials['trial']].reset_index().drop(['idx','index'], axis=1).reset_index().to_csv('experiment/mediumtrials.csv', index=False)

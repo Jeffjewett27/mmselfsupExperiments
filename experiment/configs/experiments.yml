@@ -2,3 +2,8 @@ small:
   trials: experiments/configs/smalltrials.csv
   sha: experiments/configs/smallsha.csv
   prefix: pretrainsmall
+
+det:
+  trials: experiments/configs/dettrials.csv
+  sha: experiments/configs/detsha.csv
+  prefix: det

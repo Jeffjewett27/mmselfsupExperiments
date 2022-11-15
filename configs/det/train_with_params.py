@@ -1,8 +1,8 @@
 _base_ = [
-    'models/frcnn_r50_c4.py',
+    'models/frcnn_r50_c4_params.py',
     'datasets/det_example.py',
-    'schedules/det_example.py', 
-    'default_runtime.py'
+    'schedules/parameterized.py', 
+    'parameterized_runtime.py'
 ]
 
 custom_imports = dict(

@@ -1,0 +1,5 @@
+stage,trials,epochs,save
+1,24,25,FALSE
+2,12,50,FALSE
+3,4,100,TRUE
+4,2,200,TRUE

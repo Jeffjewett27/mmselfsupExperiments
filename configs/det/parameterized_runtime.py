@@ -1,3 +1,5 @@
+import configs.det.environment as env
+
 checkpoint_config = dict(interval=4, max_keep_ckpts=2)
 # yapf:disable
 log_config = dict(
@@ -6,8 +8,8 @@ log_config = dict(
         dict(type='TextLoggerHook'),
         dict(type='NeptuneLoggerHook', interval=20, init_kwargs=dict(
             project='jeffjewett27/SMM2-SSOD',
-            name='dettest11',
-            custom_run_id='dettest11'
+            name=env.trial,
+            custom_run_id=env.trial
         )),
     ])
 # yapf:enable
